@@ -4,9 +4,8 @@
   "description": "",
   "main": "backend/index.js",
   "scripts": {
-  "dev": "set NODE_ENV=development&& nodemon backend/index.js",
-  "start": "set NODE_ENV=production&& node backend/index.js",
-
+    "dev": "cross-env NODE_ENV=development nodemon index.js",
+    "start": "cross-env NODE_ENV=production node index.js",
     "build": "npm install && npm install --prefix frontend && npm run build --prefix frontend"
   },
   "keywords": [],
@@ -20,6 +19,9 @@
     "crypto": "^1.0.1",
     "dotenv": "^17.2.1",
     "express": "^5.1.0",
+    "express-rate-limit": "^7.1.5",
+    "express-validator": "^7.0.0",
+    "helmet": "^7.1.0",
     "jsonwebtoken": "^9.0.2",
     "mailtrap": "^4.2.0",
     "mongodb": "^6.18.0",

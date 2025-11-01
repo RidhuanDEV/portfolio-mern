@@ -6,12 +6,21 @@ import { connectDb } from "./db/connectDb.js";
 import cookieParser from "cookie-parser";
 import authRoutes from "./routes/auth.route.js";
 import path from "path";
+import {
+  securityHeaders,
+  generalLimiter,
+  authLimiter,
+} from "./middleware/securityMiddleware.js";
 
 dotenv.config();
 
 const app = express();
 const __dirname = path.resolve();
 
+// ===== Security Headers =====
+app.use(securityHeaders);
+
+// ===== CORS Configuration =====
 app.use(
   cors({
     origin: process.env.CLIENT_URL, // FE URL
@@ -19,24 +28,19 @@ app.use(
   })
 );
 
-// reverse proxy trust (agar secure cookie & sameSite:none bekerja di host HTTPS)
+// ===== Trust proxy for HTTPS =====
 app.set("trust proxy", 1);
 
-// ===== Body & Cookie parsers =====
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// ===== Rate Limiting =====
+app.use(generalLimiter);
+
+// ===== Body & Cookie parsers with size limits =====
+app.use(express.json({ limit: "10kb" })); // Prevent large payload DoS
+app.use(express.urlencoded({ extended: true, limit: "10kb" }));
 app.use(cookieParser());
 
-app.get("/debug", (req, res) => {
-  res.json({
-    message: "Debug API working!",
-    timestamp: new Date(),
-    headers: req.headers,
-  });
-});
-
 // ===== API routes =====
-app.use("/api/auth", authRoutes);
+app.use("/api/auth", authLimiter, authRoutes);
 
 // ===== Static SPA (opsional, jika kamu juga host FE di server yang sama) =====
 

@@ -7,19 +7,51 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# Dependencies
 node_modules
+npm-debug.log
+
+# Build outputs
 dist
 dist-ssr
 *.local
+build/
 
+# Environment files (sensitive - NEVER commit)
 .env
-# Editor directories and files
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.production
+backend/.env
+backend/.env.local
+backend/.env.production
+frontend/.env
+frontend/.env.local
+
+# IDE & Editor
 .vscode/*
 !.vscode/extensions.json
 .idea
-.DS_Store
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Testing
+coverage/
+.nyc_output/
+
+# Misc
+.eslintcache
+.turbo/
+*.md
+*.txt
+
+test_sanitization*.sh

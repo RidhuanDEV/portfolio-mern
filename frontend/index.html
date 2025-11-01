@@ -1,10 +1,23 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite + React</title>
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <meta name="description" content="Secure MERN Authentication Application" />
+    <meta name="theme-color" content="#065f46" />
+
+    <!-- Security Headers -->
+    <!-- connect-src allows both Docker (backend:5000) and local dev (localhost:5000) -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self'; connect-src 'self' http://localhost:5000 http://backend:5000"
+    />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <title>Auth - Secure Login</title>
   </head>
   <body>
     <div id="root"></div>

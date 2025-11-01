@@ -55,7 +55,9 @@ export const useAuthStore = create((set) => ({
   checkAuth: async () => {
     set({ isCheckingAuth: true, error: null });
     try {
-      const response = await axios.get(`${API_URL}/check-auth`);
+      const response = await axios.get(`${API_URL}/check-auth`, {
+        timeout: 5000, // 5 second timeout
+      });
       set({
         error: null,
         user: response.data.user,
@@ -63,6 +65,11 @@ export const useAuthStore = create((set) => ({
         isCheckingAuth: false,
       });
     } catch (error) {
+      // 401 Unauthorized is expected when user is not authenticated
+      // Only log other errors (network issues, 5xx errors, etc)
+      if (error.response?.status !== 401) {
+        console.error("Auth check failed:", error.message);
+      }
       set({ error: null, isCheckingAuth: false, isAuthenticated: false });
     }
   },
@@ -89,7 +96,13 @@ export const useAuthStore = create((set) => ({
   logout: async () => {
     set({ isLoading: true, error: null });
     try {
-      await axios.post(`${API_URL}/logout`);
+      await axios.post(
+        `${API_URL}/logout`,
+        {},
+        {
+          timeout: 5000,
+        }
+      );
       set({
         user: null,
         isAuthenticated: false,
@@ -97,8 +110,14 @@ export const useAuthStore = create((set) => ({
         isLoading: false,
       });
     } catch (error) {
-      set({ error: "Error logging out", isLoading: false });
-      throw error;
+      // Even if logout fails, clear local state
+      set({
+        user: null,
+        isAuthenticated: false,
+        error: null,
+        isLoading: false,
+      });
+      console.error("Logout error:", error.message);
     }
   },
   forgotPassword: async (email) => {
