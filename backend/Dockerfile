@@ -4,6 +4,9 @@ WORKDIR /app
 
 COPY package*.json ./
 
+# healthcheck di semua type image (dev dan prod)
+RUN apk add --no-cache curl
+
 ## Development image (for local dev with nodemon)
 FROM base AS development
 RUN npm ci
@@ -11,6 +14,7 @@ COPY . .
 EXPOSE 5000
 ENV NODE_ENV=development
 CMD ["npm", "run", "dev"]
+
 
 ## Production image (minimal, installs only production deps)
 FROM node:20-alpine AS production

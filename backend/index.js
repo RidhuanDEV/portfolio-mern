@@ -11,6 +11,7 @@ import {
   generalLimiter,
   authLimiter,
 } from "./middleware/securityMiddleware.js";
+import mongoose from "mongoose";
 
 dotenv.config();
 
@@ -27,6 +28,17 @@ app.use(
     credentials: true,
   })
 );
+
+// health check endpoint
+app.get("/health", (_req, res) => {
+  const dbReady = mongoose.connection?.readyState; // 1 means connected
+  res.status(200).json({
+    status: "OK",
+    uptime: process.uptime(),
+    timestamp: Date.now(),
+    database: dbReady === 1 ? "Connected" : "Disconnected"
+  });
+});
 
 // ===== Trust proxy for HTTPS =====
 app.set("trust proxy", 1);
@@ -47,7 +59,7 @@ app.use("/api/auth", authLimiter, authRoutes);
 app.use(express.static(path.join(__dirname, "frontend/dist")));
 
 // Layani semua route non-API ke index.html (SPA)
-app.get(/^\/(?!api).*/, (req, res) => {
+app.get(/^\/(?!api).*/, (_req, res) => {
   res.sendFile(path.join(__dirname, "frontend", "dist", "index.html"));
 });
 
