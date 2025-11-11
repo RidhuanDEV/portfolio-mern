@@ -175,6 +175,14 @@ export const logout = async (req, res) => {
     path: "/", // path wajib sama seperti saat set cookie
   });
 
+  // Clear readable CSRF cookie as well
+  res.clearCookie("XSRF-TOKEN", {
+    httpOnly: false,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+    path: "/",
+  });
+
   res.status(200).json({
     success: true,
     message: "Logged out successfully",

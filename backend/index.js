@@ -5,13 +5,14 @@ import cors from "cors";
 import { connectDb } from "./db/connectDb.js";
 import cookieParser from "cookie-parser";
 import authRoutes from "./routes/auth.route.js";
+import homeRoutes from "./routes/home.route.js";
+import { csrfMiddleware } from "./middleware/csrfMiddleware.js";
 import path from "path";
 import {
   securityHeaders,
   generalLimiter,
   authLimiter,
 } from "./middleware/securityMiddleware.js";
-import mongoose from "mongoose";
 
 dotenv.config();
 
@@ -29,17 +30,6 @@ app.use(
   })
 );
 
-// health check endpoint
-app.get("/health", (_req, res) => {
-  const dbReady = mongoose.connection?.readyState; // 1 means connected
-  res.status(200).json({
-    status: "OK",
-    uptime: process.uptime(),
-    timestamp: Date.now(),
-    database: dbReady === 1 ? "Connected" : "Disconnected"
-  });
-});
-
 // ===== Trust proxy for HTTPS =====
 app.set("trust proxy", 1);
 
@@ -51,15 +41,20 @@ app.use(express.json({ limit: "10kb" })); // Prevent large payload DoS
 app.use(express.urlencoded({ extended: true, limit: "10kb" }));
 app.use(cookieParser());
 
+// ===== CSRF protection (double-submit) =====
+// Validates that state-changing requests include x-xsrf-token header matching XSRF-TOKEN cookie
+app.use(csrfMiddleware);
+
 // ===== API routes =====
 app.use("/api/auth", authLimiter, authRoutes);
+app.use("/api/home", homeRoutes);
 
 // ===== Static SPA (opsional, jika kamu juga host FE di server yang sama) =====
 
 app.use(express.static(path.join(__dirname, "frontend/dist")));
 
 // Layani semua route non-API ke index.html (SPA)
-app.get(/^\/(?!api).*/, (_req, res) => {
+app.get(/^\/(?!api).*/, (req, res) => {
   res.sendFile(path.join(__dirname, "frontend", "dist", "index.html"));
 });
 

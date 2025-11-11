@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { motion } from "framer-motion";
+import { motion as Motion } from "framer-motion";
 import { useAuthStore } from "../store/authStore";
 import { useNavigate, useParams } from "react-router-dom";
 import Input from "../components/Input.jsx";
@@ -35,7 +35,7 @@ const ResetPasswordPage = () => {
 	};
 
 	return (
-		<motion.div
+		<Motion.div
 			initial={{ opacity: 0, y: 20 }}
 			animate={{ opacity: 1, y: 0 }}
 			transition={{ duration: 0.5 }}
@@ -67,7 +67,7 @@ const ResetPasswordPage = () => {
 						required
 					/>
 
-					<motion.button
+					<Motion.button
 						whileHover={{ scale: 1.02 }}
 						whileTap={{ scale: 0.98 }}
 						className='w-full py-3 px-4 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-bold rounded-lg shadow-lg hover:from-green-600 hover:to-emerald-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition duration-200'
@@ -75,10 +75,10 @@ const ResetPasswordPage = () => {
 						disabled={isLoading}
 					>
 						{isLoading ? "Resetting..." : "Set New Password"}
-					</motion.button>
+					</Motion.button>
 				</form>
 			</div>
-		</motion.div>
+		</Motion.div>
 	);
 };
 export default ResetPasswordPage;

@@ -1,6 +1,6 @@
 import React from "react";
 import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import { motion as Motion } from "framer-motion";
 import Input from "../components/Input.jsx";
 import { Mail, Loader, Lock } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
@@ -30,7 +30,7 @@ const LoginPage = () => {
   };
 
   return (
-    <motion.div
+    <Motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
@@ -64,20 +64,22 @@ const LoginPage = () => {
           >
             Forgot Password?
           </Link>
-          <motion.button
+          <Motion.button
             className="mt-5 w-full py-3 px-4 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-bold
             rounded-lg shadow-lg hover:from-green-600 hover:to-emerald-700 focus:outline-none focus:ring-2 focus:ring-green-500
             focus:ring-offset-2 focus:ring-offset-gray-900 transition duration-200"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.96 }}
+            disabled={isLoading || !email || !password}
             type="submit"
+            
           >
             {isLoading ? (
-              <Loader className="animate-spin mx-auto" size={24} />
+              <Loader className="animate-spin mx-auto" size={24} aria-disabled="true" />
             ) : (
               "Log In"
             )}
-          </motion.button>
+          </Motion.button>
         </form>
       </div>
       <div className="px-8 py-4 bg-gray-900 bg-opacity-50 flex justify-center">
@@ -90,7 +92,7 @@ const LoginPage = () => {
           </div>
         </div>
       </div>
-    </motion.div>
+    </Motion.div>
   );
 };
 

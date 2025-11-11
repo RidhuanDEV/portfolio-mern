@@ -1,9 +1,9 @@
-import { motion } from "framer-motion";
 import { useAuthStore } from "../store/authStore";
 import Input from "../components/Input.jsx";
 import { Mail,ArrowLeft,Loader } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { motion as Motion } from "framer-motion";
 
 const ForgotPasswordPage = () => {
   const [email, setEmail] = useState("");
@@ -19,7 +19,7 @@ const ForgotPasswordPage = () => {
     }
   };
   return (
-    <motion.div
+    <Motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
@@ -44,7 +44,7 @@ const ForgotPasswordPage = () => {
                 required
               />
               {error && <p className="text-red-500 text-sm">{error}</p>}
-              <motion.button
+              <Motion.button
                 className="mt-5 w-full py-3 px-4 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-bold
                           rounded-lg shadow-lg hover:from-green-600 hover:to-emerald-700 focus:outline-none focus:ring-2 focus:ring-green-500
                           focus:ring-offset-2 focus:ring-offset-gray-900 transition duration-200"
@@ -58,18 +58,18 @@ const ForgotPasswordPage = () => {
                 ) : (
                   "Forgot Password"
                 )}
-              </motion.button>
+              </Motion.button>
             </form>
           ) : (
             <div className="text-center">
-                <motion.div
+                <Motion.div
                 initial ={{ scale:0}}
                 animate ={{scale: 1}}
                 transition={{type : "spring", stiffness: 500, damping: 50}}
                 className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4"
                 >
                     <Mail className="w-8 h-8 text-white" />
-                </motion.div>
+                </Motion.div>
                 <p className="text-gray-300 mb-6">If an account exists for {email} , you will receive a password reset link shortly.</p>
             </div>
           )}
@@ -79,7 +79,7 @@ const ForgotPasswordPage = () => {
                </Link>
           </div>
       </div>
-    </motion.div>
+    </Motion.div>
   );
 };
 

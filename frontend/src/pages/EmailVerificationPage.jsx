@@ -1,10 +1,10 @@
 import React from "react";
 import { useState } from "react";
-import { motion } from "framer-motion";
+import { motion as Motion } from "framer-motion";
 import Input from "../components/Input.jsx";
 import { useNavigate } from "react-router-dom";
 import { useRef } from "react";
-import { useEffect } from "react";
+import { useEffect, useCallback } from "react";
 import { useAuthStore } from "../store/authStore.js";
 import toast from "react-hot-toast";
 import { Loader } from "lucide-react";
@@ -47,7 +47,7 @@ const EmailVerificationPage = () => {
     }
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = useCallback(async (e) => {
     e.preventDefault();
     try {
         const verificationCode = code.join("");
@@ -57,21 +57,21 @@ const EmailVerificationPage = () => {
     } catch (error) {
         toast.error("Error submitting code: " + error.message);
     }
-  };
+  }, [code, verifyEmail, navigate]);
 
   //Auto Submit when all field are filled
   useEffect(() => {
     if (code.every((digit) => digit !== "")) {
       handleSubmit(new Event("submit"));
     }
-  }, [code]);
+  }, [code, handleSubmit]);
 
   return (
     <div
       className="max-w-md w -full bg-gray-800 bg-opacity-50 backdrop-filter backdrop-blur-xl rounded-2xl
      shadow-xl overflow-hidden"
     >
-      <motion.div
+      <Motion.div
         initial={{ opacity: 0, y: -50 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
@@ -100,7 +100,7 @@ const EmailVerificationPage = () => {
             ))}
           </div>
           {error && <p className='text-red-500 font-semibold mt-2'>{error}</p>}
-          <motion.button
+          <Motion.button
             className="mt-5 w-full py-3 px-4 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-bold
                       rounded-lg shadow-lg hover:from-green-600 hover:to-emerald-700 focus:outline-none focus:ring-2 focus:ring-green-500
                       focus:ring-offset-2 focus:ring-offset-gray-900 transition duration-200"
@@ -110,9 +110,9 @@ const EmailVerificationPage = () => {
             type="submit"
           >
             {isLoading ? <Loader className="animate-spin mx-auto" size={24} /> : "Verify Email"}
-          </motion.button>
+          </Motion.button>
         </form>
-      </motion.div>
+      </Motion.div>
     </div>
   );
 };

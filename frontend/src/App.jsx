@@ -9,6 +9,10 @@ import { useEffect } from "react";
 import DashboardPage from "./pages/DashboardPage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
+import { Loader } from "lucide-react";
+import ProjectPage from "./pages/ProjectPage";
+import AboutPage from "./pages/AboutPage";
+import ProfilePage from "./pages/ProfilePage";
 
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, user } = useAuthStore();
@@ -26,6 +30,12 @@ const RedirectAuthenticatedUserToHome = ({ children }) => {
   const { isAuthenticated, user } = useAuthStore();
 
   if (isAuthenticated && user.isVerified) {
+    if (children.props.path === "/projects") {
+      return <Navigate to="/projects" replace />;
+    }
+    if (children.props.path === "/about") {
+      return <Navigate to="/about" replace />;
+    }
     return <Navigate to="/" replace />;
   }
 
@@ -33,11 +43,19 @@ const RedirectAuthenticatedUserToHome = ({ children }) => {
 };
 
 function App() {
-  const { user, isAuthenticated, checkAuth, isCheckingAuth } = useAuthStore();
+  const { checkAuth, isCheckingAuth } = useAuthStore();
 
   useEffect(() => {
     checkAuth();
   }, [checkAuth]);
+
+  if (isCheckingAuth) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-900">
+        <Loader className="animate-spin text-green-500" size={48} />
+      </div>
+    );
+  }
 
   return (
     <>
@@ -63,14 +81,33 @@ function App() {
           left="-10%"
           delay={2}
         />
+        <FloatingShape
+          color="bg-green-300"
+          size="w-64 h-64"
+          top="10%"
+          left="-10%"
+          delay={0}
+        />
+        <FloatingShape
+          color="bg-emerald-500"
+          size="w-48 h-48"
+          top="50%"
+          left="60%"
+          delay={5}
+        />
+        <FloatingShape
+          color="bg-green-300"
+          size="w-64 h-64"
+          top="70%"
+          left="10%"
+          delay={0}
+        />
 
         <Routes>
           <Route
             path="/"
             element={
-              <ProtectedRoute>
                 <DashboardPage />
-              </ProtectedRoute>
             }
           />
           <Route
@@ -112,6 +149,30 @@ function App() {
               <RedirectAuthenticatedUserToHome>
                 <ResetPasswordPage />
               </RedirectAuthenticatedUserToHome>
+            }
+          />
+          <Route
+            path="/projects"
+            element={
+              <ProtectedRoute>
+                <ProjectPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/about"
+            element={
+              <ProtectedRoute>
+                <AboutPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <ProfilePage />
+              </ProtectedRoute>
             }
           />
 
