@@ -2,15 +2,6 @@ import { Home } from "../models/home.model.js";
 import { User } from "../models/user.model.js";
 import { uploadToCloudinary } from "../utils/cloudinary.utils.js";
 
-// Helper function to fix Cloudinary PDF URLs
-const fixCloudinaryPdfUrl = (url) => {
-  if (!url || !url.includes("cloudinary.com")) {
-    return url;
-  }
-  // Replace /image/upload/ with /raw/upload/ for PDF files
-  return url.replace("/image/upload/", "/raw/upload/");
-};
-
 //gethome untuk fungsi all user (view) - tanpa autentikasi, berdasarkan email
 export const getHome = async (req, res) => {
   try {
@@ -49,7 +40,7 @@ export const getHome = async (req, res) => {
         hobbies: home.hobbies,
         intro: home.intro,
         profile_picture_url: home.profile_picture_url,
-        download_cv: fixCloudinaryPdfUrl(home.download_cv),
+        download_cv: home.download_cv,
         facebook_url: home.facebook_url,
         instagram_url: home.instagram_url,
         linkedin_url: home.linkedin_url,
@@ -130,7 +121,7 @@ export const updateHome = async (req, res) => {
           const cvFolder = req.body.download_cv_folder || "cv";
           console.log("Uploading CV to folder:", cvFolder);
           const cvResult = await uploadToCloudinary(downloadCv.path, cvFolder);
-          updateData.download_cv = fixCloudinaryPdfUrl(cvResult.url);
+          updateData.download_cv = cvResult.url;
           console.log("CV uploaded:", cvResult.url);
         } catch (uploadError) {
           console.error("CV upload failed:", uploadError);

@@ -4,7 +4,6 @@ import Card from "../components/Card.jsx";
 import React, { useEffect } from "react";
 import { useDataStore } from "../store/useDataStore.js";
 import { Loader } from "lucide-react";
-import { fixCloudinaryPdfUrl } from "../utils/cloudinary.js";
 
 const offers = [
   {
@@ -51,10 +50,9 @@ const DashboardPage = () => {
     const resumeUrl = home?.download_cv || "./resume.pdf";
 
     try {
-      // If it's a Cloudinary URL, fix the URL for PDFs and fetch it
+      // If it's a Cloudinary URL, fetch it directly
       if (resumeUrl.includes("cloudinary.com")) {
-        const fixedUrl = fixCloudinaryPdfUrl(resumeUrl);
-        const response = await fetch(fixedUrl, {
+        const response = await fetch(resumeUrl, {
           method: "GET",
           headers: {
             Accept: "application/pdf,*/*",
@@ -89,8 +87,7 @@ const DashboardPage = () => {
     } catch (error) {
       console.error("Error downloading resume:", error);
       // Fallback: try opening in new tab
-      const fixedUrl = fixCloudinaryPdfUrl(resumeUrl);
-      window.open(fixedUrl, "_blank");
+      window.open(resumeUrl, "_blank");
     }
   };
 
