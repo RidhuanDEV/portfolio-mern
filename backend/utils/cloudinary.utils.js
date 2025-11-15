@@ -15,12 +15,12 @@ export const uploadToCloudinary = async (filePath, folder = "portfolio") => {
     let uploadOptions = {
       folder: `auth-mern/${folder}`,
       resource_type: resourceType,
-      access_mode: "public",
+      type: "upload", // Ensure it's uploaded as a regular upload (public)
     };
 
     // Special handling for PDFs
     if (isPdf) {
-      uploadOptions.resource_type = "image"; // PDFs can be uploaded as images and accessed via image URLs
+      uploadOptions.resource_type = "raw"; // Upload PDFs as raw resources
       uploadOptions.format = "pdf"; // Explicitly set format
     }
 
@@ -80,5 +80,22 @@ export const checkResourceExists = async (publicId, resourceType = "image") => {
     }
     console.error("Cloudinary resource check error:", error);
     throw new Error(`Resource check failed: ${error.message}`);
+  }
+};
+
+export const makeResourcePublic = async (publicId, resourceType = "image") => {
+  try {
+    // Use explicit to make the resource public
+    const result = await cloudinary.uploader.explicit(publicId, {
+      resource_type: resourceType,
+      type: "upload", // Make it a public upload
+    });
+    return {
+      success: true,
+      result,
+    };
+  } catch (error) {
+    console.error("Cloudinary make public error:", error);
+    throw new Error(`Make public failed: ${error.message}`);
   }
 };

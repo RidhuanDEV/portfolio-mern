@@ -50,9 +50,18 @@ const DashboardPage = () => {
     const resumeUrl = home?.download_cv || "./resume.pdf";
 
     try {
-      // If it's a Cloudinary URL, fetch it directly
+      // If it's a Cloudinary URL, fix the URL for PDFs (raw resources) and fetch it
       if (resumeUrl.includes("cloudinary.com")) {
-        const response = await fetch(resumeUrl, {
+        let fixedUrl = resumeUrl;
+        // If it's a PDF URL that uses /image/upload/, change it to /raw/upload/
+        if (
+          resumeUrl.includes("/image/upload/") &&
+          resumeUrl.includes(".pdf")
+        ) {
+          fixedUrl = resumeUrl.replace("/image/upload/", "/raw/upload/");
+        }
+
+        const response = await fetch(fixedUrl, {
           method: "GET",
           headers: {
             Accept: "application/pdf,*/*",
