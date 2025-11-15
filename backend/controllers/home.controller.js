@@ -137,7 +137,7 @@ export const updateHome = async (req, res) => {
         }
       }
 
-      // Upload CV
+      // Upload CV - Save locally instead of Cloudinary
       const downloadCv = req.files.find(
         (file) => file.fieldname === "download_cv"
       );
