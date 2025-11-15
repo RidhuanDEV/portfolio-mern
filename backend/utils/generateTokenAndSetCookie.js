@@ -16,8 +16,8 @@ export const generateTokenAndSetCookie = (res, userId) => {
   // Set JWT as httpOnly cookie
   res.cookie("token", token, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production", // Vercel/host lain pakai HTTPS
-    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+    secure: process.env.NODE_ENV === "production", // HTTPS di production
+    sameSite: "lax", // Changed from 'none' to 'lax' for better compatibility
     maxAge: 7 * 24 * 60 * 60 * 1000,
     path: "/",
   });
@@ -26,7 +26,7 @@ export const generateTokenAndSetCookie = (res, userId) => {
   res.cookie("XSRF-TOKEN", csrfToken, {
     httpOnly: false,
     secure: process.env.NODE_ENV === "production",
-    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+    sameSite: "lax", // Changed from 'none' to 'lax' for better compatibility
     maxAge: 7 * 24 * 60 * 60 * 1000,
     path: "/",
   });

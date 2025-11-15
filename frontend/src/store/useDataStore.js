@@ -35,6 +35,7 @@ export const useDataStore = create((set) => ({
     try {
       const res = await axios.get(`${API_BASE}/home`, {
         params: { email },
+        timeout: 10000, // 10 seconds timeout
       });
       // kalau 2xx tapi success=false (jarang, tapi amankan)
       if (res.data?.success === false) {
@@ -52,6 +53,7 @@ export const useDataStore = create((set) => ({
         message: res.data?.message || "OK",
       });
     } catch (err) {
+      console.error("Home data fetch error:", err);
       // Jika 404, treat sebagai no data, bukan error
       if (err.response?.status === 404) {
         set({
@@ -179,7 +181,8 @@ export const useDataStore = create((set) => ({
       console.error("Update home error:", err);
       set({
         error: true,
-        message: err.response?.data?.message || err.message || "Failed to update home",
+        message:
+          err.response?.data?.message || err.message || "Failed to update home",
       });
     } finally {
       set({ isLoading: false });

@@ -171,7 +171,7 @@ export const logout = async (req, res) => {
   res.clearCookie("token", {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production", // HTTPS di production
-    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+    sameSite: "lax",
     path: "/", // path wajib sama seperti saat set cookie
   });
 
@@ -179,7 +179,7 @@ export const logout = async (req, res) => {
   res.clearCookie("XSRF-TOKEN", {
     httpOnly: false,
     secure: process.env.NODE_ENV === "production",
-    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+    sameSite: "lax",
     path: "/",
   });
 
