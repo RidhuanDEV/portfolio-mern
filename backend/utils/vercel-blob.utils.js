@@ -1,5 +1,6 @@
 import { put, del } from "@vercel/blob";
 import path from "path";
+import fs from "fs";
 
 // Utility functions for Vercel Blob storage
 export const uploadToVercelBlob = async (filePath, folder = "uploads") => {
@@ -7,8 +8,12 @@ export const uploadToVercelBlob = async (filePath, folder = "uploads") => {
     const fileName = path.basename(filePath);
     const blobPath = `${folder}/${Date.now()}-${fileName}`;
 
-    const blob = await put(blobPath, filePath, {
+    // Read file content
+    const fileContent = fs.readFileSync(filePath);
+
+    const blob = await put(blobPath, fileContent, {
       access: "public",
+      contentType: "application/pdf", // Explicitly set content type for PDF
     });
 
     return {
