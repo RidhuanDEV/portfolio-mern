@@ -59,6 +59,9 @@ app.use("/api", uploadRoutes); // Upload route: /api/upload
 
 app.use(express.static(path.join(__dirname, "frontend/dist")));
 
+// ===== Static file serving for uploads =====
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
 // Layani semua route non-API ke index.html (SPA)
 app.get(/^\/(?!api).*/, (req, res) => {
   res.sendFile(path.join(__dirname, "frontend", "dist", "index.html"));

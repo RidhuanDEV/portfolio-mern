@@ -1,6 +1,9 @@
 import { Home } from "../models/home.model.js";
 import { User } from "../models/user.model.js";
 import { uploadToCloudinary } from "../utils/cloudinary.utils.js";
+import path from "path";
+import fs from "fs";
+import { fileURLToPath } from "url";
 
 // Helper function to fix Cloudinary PDF URLs
 const fixCloudinaryPdfUrl = (url) => {
@@ -12,6 +15,29 @@ const fixCloudinaryPdfUrl = (url) => {
     return url.replace("/image/upload/", "/raw/upload/");
   }
   return url;
+};
+
+// Helper function to save CV locally
+const saveCvLocally = (file, userId) => {
+  const __filename = fileURLToPath(import.meta.url);
+  const __dirname = path.dirname(__filename);
+  const uploadsDir = path.join(__dirname, "..", "uploads", "cv");
+
+  // Ensure uploads/cv directory exists
+  if (!fs.existsSync(uploadsDir)) {
+    fs.mkdirSync(uploadsDir, { recursive: true });
+  }
+
+  // Generate unique filename with user ID
+  const fileExtension = path.extname(file.originalname);
+  const filename = `cv_${userId}_${Date.now()}${fileExtension}`;
+  const filePath = path.join(uploadsDir, filename);
+
+  // Move file from temp to uploads/cv
+  fs.renameSync(file.path, filePath);
+
+  // Return relative path for serving
+  return `/uploads/cv/${filename}`;
 };
 
 //gethome untuk fungsi all user (view) - tanpa autentikasi, berdasarkan email
@@ -52,7 +78,7 @@ export const getHome = async (req, res) => {
         hobbies: home.hobbies,
         intro: home.intro,
         profile_picture_url: home.profile_picture_url,
-        download_cv: fixCloudinaryPdfUrl(home.download_cv),
+        download_cv: home.download_cv, // No need to fix URL since it's local
         facebook_url: home.facebook_url,
         instagram_url: home.instagram_url,
         linkedin_url: home.linkedin_url,
@@ -130,13 +156,12 @@ export const updateHome = async (req, res) => {
       );
       if (downloadCv) {
         try {
-          const cvFolder = req.body.download_cv_folder || "cv";
-          console.log("Uploading CV to folder:", cvFolder);
-          const cvResult = await uploadToCloudinary(downloadCv.path, cvFolder);
-          updateData.download_cv = fixCloudinaryPdfUrl(cvResult.url);
-          console.log("CV uploaded:", cvResult.url);
+          console.log("Saving CV locally...");
+          const cvPath = saveCvLocally(downloadCv, userId);
+          updateData.download_cv = cvPath;
+          console.log("CV saved locally:", cvPath);
         } catch (uploadError) {
-          console.error("CV upload failed:", uploadError);
+          console.error("CV save failed:", uploadError);
           // Don't fail the whole request, just log the error
         }
       }

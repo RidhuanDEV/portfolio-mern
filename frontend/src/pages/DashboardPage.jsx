@@ -50,49 +50,13 @@ const DashboardPage = () => {
     const resumeUrl = home?.download_cv || "./resume.pdf";
 
     try {
-      // If it's a Cloudinary URL, fix the URL for PDFs (raw resources) and fetch it
-      if (resumeUrl.includes("cloudinary.com")) {
-        let fixedUrl = resumeUrl;
-        // If it's a PDF URL that uses /image/upload/, change it to /raw/upload/
-        if (
-          resumeUrl.includes("/image/upload/") &&
-          resumeUrl.includes(".pdf")
-        ) {
-          fixedUrl = resumeUrl.replace("/image/upload/", "/raw/upload/");
-        }
-
-        const response = await fetch(fixedUrl, {
-          method: "GET",
-          headers: {
-            Accept: "application/pdf,*/*",
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const blob = await response.blob();
-        const url = window.URL.createObjectURL(blob);
-
-        const link = document.createElement("a");
-        link.href = url;
-        link.download = "resume.pdf";
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-
-        // Clean up the object URL
-        window.URL.revokeObjectURL(url);
-      } else {
-        // For local files, use direct download
-        const link = document.createElement("a");
-        link.href = resumeUrl;
-        link.download = "resume.pdf";
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-      }
+      // Direct download for local files
+      const link = document.createElement("a");
+      link.href = resumeUrl;
+      link.download = "resume.pdf";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     } catch (error) {
       console.error("Error downloading resume:", error);
       // Fallback: try opening in new tab
