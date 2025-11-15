@@ -12,10 +12,10 @@ const LoginPage = () => {
   const { error, login, isLoading, isAuthenticated, user } = useAuthStore();
   const navigate = useNavigate();
 
-  // Auto-redirect ke dashboard jika user sudah login & verified
+  // Auto-redirect ke profile jika user sudah login & verified
   useEffect(() => {
     if (isAuthenticated && user?.isVerified) {
-      navigate("/");
+      navigate("/profile");
     }
   }, [isAuthenticated, user?.isVerified, navigate]);
 
@@ -67,15 +67,18 @@ const LoginPage = () => {
           <Motion.button
             className="mt-5 w-full py-3 px-4 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-bold
             rounded-lg shadow-lg hover:from-green-600 hover:to-emerald-700 focus:outline-none focus:ring-2 focus:ring-green-500
-            focus:ring-offset-2 focus:ring-offset-gray-900 transition duration-200"
+            focus:ring-offset-2 focus:ring-offset-gray-900 transition duration-200 cursor-pointer"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.96 }}
             disabled={isLoading || !email || !password}
             type="submit"
-            
           >
             {isLoading ? (
-              <Loader className="animate-spin mx-auto" size={24} aria-disabled="true" />
+              <Loader
+                className="animate-spin mx-auto"
+                size={24}
+                aria-disabled="true"
+              />
             ) : (
               "Log In"
             )}

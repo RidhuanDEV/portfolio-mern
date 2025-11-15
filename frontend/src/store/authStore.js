@@ -12,67 +12,6 @@ export const useAuthStore = create((set) => ({
   isCheckingAuth: true,
   message: null,
 
-  signup: async (email, password, name) => {
-    set({ isLoading: true, error: null });
-    try {
-      const response = await axios.post(`${API_URL}/signup`, {
-        email,
-        password,
-        name,
-      });
-      set({
-        user: response.data.user,
-        isAuthenticated: true,
-        isLoading: false,
-      });
-    } catch (error) {
-      const message =
-        error?.response?.data?.message || error.message || "Error Signing up";
-      set({ error: message, isLoading: false });
-      throw error;
-    }
-  },
-
-  verifyEmail: async (code) => {
-    set({ isLoading: true, error: null });
-    try {
-      const response = await axios.post(`${API_URL}/verify-email`, { code });
-      set({
-        user: response.data.user,
-        isAuthenticated: true,
-        isLoading: false,
-      });
-    } catch (error) {
-      const message =
-        error?.response?.data?.message ||
-        error.message ||
-        "Error verifying email";
-      set({ error: message, isLoading: false });
-      throw error;
-    }
-  },
-
-  checkAuth: async () => {
-    set({ isCheckingAuth: true, error: null });
-    try {
-      const response = await axios.get(`${API_URL}/check-auth`, {
-        timeout: 5000, // 5 second timeout
-      });
-      set({
-        error: null,
-        user: response.data.user,
-        isAuthenticated: true,
-        isCheckingAuth: false,
-      });
-    } catch (error) {
-      // 401 Unauthorized is expected when user is not authenticated
-      // Only log other errors (network issues, 5xx errors, etc)
-      if (error.response?.status !== 401) {
-        console.error("Auth check failed:", error.message);
-      }
-      set({ error: null, isCheckingAuth: false, isAuthenticated: false });
-    }
-  },
   login: async (email, password) => {
     set({ isLoading: true, error: null });
     try {
@@ -80,6 +19,8 @@ export const useAuthStore = create((set) => ({
         email,
         password,
       });
+      // Store token in localStorage for persistence
+      localStorage.setItem("auth_token", "true"); // Simple flag that token exists
       set({
         isAuthenticated: true,
         user: response.data.user,
@@ -93,6 +34,7 @@ export const useAuthStore = create((set) => ({
       throw error;
     }
   },
+
   logout: async () => {
     set({ isLoading: true, error: null });
     try {
@@ -103,6 +45,8 @@ export const useAuthStore = create((set) => ({
           timeout: 5000,
         }
       );
+      // Clear token from localStorage
+      localStorage.removeItem("auth_token");
       set({
         user: null,
         isAuthenticated: false,
@@ -110,7 +54,8 @@ export const useAuthStore = create((set) => ({
         isLoading: false,
       });
     } catch (error) {
-      // Even if logout fails, clear local state
+      // Even if logout fails, clear local state and storage
+      localStorage.removeItem("auth_token");
       set({
         user: null,
         isAuthenticated: false,
@@ -120,40 +65,33 @@ export const useAuthStore = create((set) => ({
       console.error("Logout error:", error.message);
     }
   },
-  forgotPassword: async (email) => {
-    set({ isLoading: true, error: null });
-    try {
-      const response = await axios.post(`${API_URL}/forgot-password`, {
-        email,
-      });
-      set({ message: response.data.message, isLoading: false });
-    } catch (error) {
-      const message =
-        error?.response?.data?.message ||
-        error.message ||
-        "Error sending password reset email";
-      set({ error: message, isLoading: false });
-      throw error;
-    }
-  },
-  resetPassword: async (token, password) => {
-    set({ isLoading: true, error: null });
-    try {
-      // ✅ Encode token supaya aman di URL
-      const encodedToken = encodeURIComponent(token);
 
-      const response = await axios.post(
-        `${API_URL}/reset-password/${encodedToken}`,
-        { password }
-      );
-      set({ message: response.data.message, isLoading: false });
+  checkAuth: async () => {
+    set({ isCheckingAuth: true });
+    try {
+      // Check if we have a stored token indicator
+      const hasToken = localStorage.getItem("auth_token");
+      if (!hasToken) {
+        set({ isCheckingAuth: false });
+        return;
+      }
+
+      // Verify the token with the backend
+      const response = await axios.get(`${API_URL}/check-auth`);
+      set({
+        isAuthenticated: true,
+        user: response.data.user,
+        isCheckingAuth: false,
+      });
     } catch (error) {
-      const message =
-        error?.response?.data?.message ||
-        error.message ||
-        "Error resetting password";
-      set({ error: message, isLoading: false });
-      throw error;
+      // Token is invalid or expired, clear storage
+      localStorage.removeItem("auth_token");
+      set({
+        user: null,
+        isAuthenticated: false,
+        isCheckingAuth: false,
+      });
+      console.error("Auth check failed:", error.message);
     }
   },
 }));
