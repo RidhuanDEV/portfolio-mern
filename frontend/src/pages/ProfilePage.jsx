@@ -9,7 +9,7 @@ import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 
 const ProfilePage = () => {
-  const { user, logout } = useAuthStore();
+  const { logout } = useAuthStore();
   const navigate = useNavigate();
   const {
     home,
@@ -18,9 +18,6 @@ const ProfilePage = () => {
     isLoading,
     error,
     message,
-    homeData,
-    aboutData,
-    projectsData,
     updateHome,
     updateAbout,
     createProject,
@@ -81,15 +78,6 @@ const ProfilePage = () => {
     await logout();
     navigate("/");
   };
-
-  useEffect(() => {
-    if (user?.email) {
-      homeData(user.email);
-      aboutData(user.email);
-      projectsData(user.email);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user]); // Removed function dependencies to prevent infinite loop
 
   useEffect(() => {
     if (home) {
@@ -165,9 +153,6 @@ const ProfilePage = () => {
       await updateHome(formData);
       toast.success("Home data saved successfully!");
 
-      // Fetch updated data to get new URLs
-      await homeData(user.email);
-
       // Reset file states after successful save
       setHomeFiles({
         profile_picture: null,
@@ -237,9 +222,6 @@ const ProfilePage = () => {
 
       await updateAbout(formData);
       toast.success("About data saved successfully!");
-
-      // Fetch updated data to get new URLs
-      await aboutData(user.email);
 
       // Reset file states after successful save
       setAboutFiles({

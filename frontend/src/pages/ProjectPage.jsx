@@ -1,17 +1,11 @@
 import { motion as Motion } from "framer-motion";
-import React, { useEffect } from "react";
+import React from "react";
 import NavBar from "../components/NavBar";
 import ProjectCard from "../components/ProjectCard";
 import { useDataStore } from "../store/useDataStore";
 
 const ProjectPage = () => {
-  const { projects, isLoading, error, message, projectsData } = useDataStore();
-
-  useEffect(() => {
-    if (!projects) {
-      projectsData("ridhuandf1@gmail.com"); // fetch projects berdasarkan email
-    }
-  }, [projects, projectsData]);
+  const { projects, isLoading, error, message } = useDataStore();
 
   if (isLoading) {
     return (
@@ -28,12 +22,6 @@ const ProjectPage = () => {
           <p className="text-red-500 text-lg mb-4">
             {message || "An error occurred."}
           </p>
-          <button
-            onClick={() => projectsData("ridhuandf1@gmail.com")}
-            className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-          >
-            Try Again
-          </button>
         </div>
       </div>
     );

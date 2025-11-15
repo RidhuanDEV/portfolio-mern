@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import NavBar from "../components/NavBar";
 import { motion as Motion } from "framer-motion";
 import { useDataStore } from "../store/useDataStore";
@@ -6,13 +6,7 @@ import { Loader } from "lucide-react";
 
 const AboutPage = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
-  const { about, isLoading, error, message, aboutData } = useDataStore();
-
-  useEffect(() => {
-    if (!about) {
-      aboutData("ridhuandf1@gmail.com");
-    }
-  }, [aboutData, about]);
+  const { about, isLoading, error, message } = useDataStore();
 
   // Default data jika belum ada data dari database
   const defaultTestimonials = [
@@ -121,12 +115,6 @@ const AboutPage = () => {
           <p className="text-red-500 text-lg mb-4">
             {message || "An error occurred."}
           </p>
-          <button
-            onClick={() => aboutData("ridhuandf1@gmail.com")}
-            className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors cursor-pointer"
-          >
-            Try Again
-          </button>
         </div>
       </div>
     );

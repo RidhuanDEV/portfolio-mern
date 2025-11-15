@@ -7,6 +7,7 @@ import ProjectPage from "./pages/ProjectPage";
 import AboutPage from "./pages/AboutPage";
 import ProfilePage from "./pages/ProfilePage";
 import { useAuthStore } from "./store/authStore";
+import { useDataStore } from "./store/useDataStore";
 import { useEffect } from "react";
 
 // Protected Route Component
@@ -32,12 +33,23 @@ const ProtectedRoute = ({ children }) => {
 };
 
 function App() {
-  const { checkAuth, isCheckingAuth } = useAuthStore();
+  const { checkAuth, isCheckingAuth, user } = useAuthStore();
+  const { homeData, aboutData, projectsData } = useDataStore();
 
   // Check authentication on app load
   useEffect(() => {
     checkAuth();
   }, [checkAuth]);
+
+  // Fetch all portfolio data after authentication
+  useEffect(() => {
+    if (!isCheckingAuth && user?.email) {
+      // Fetch all data for public pages
+      homeData(user.email);
+      aboutData(user.email);
+      projectsData(user.email);
+    }
+  }, [isCheckingAuth, user, homeData, aboutData, projectsData]);
 
   // Show loading while checking authentication
   if (isCheckingAuth) {

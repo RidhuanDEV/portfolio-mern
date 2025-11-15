@@ -30,15 +30,6 @@ const DashboardPage = () => {
   const home = useDataStore((store) => store.home);
   const error = useDataStore((store) => store.error);
   const message = useDataStore((store) => store.message);
-  const homeData = useDataStore((store) => store.homeData);
-
-  useEffect(() => {
-    // Only fetch data once on mount, not on every home change
-    if (!home) {
-      homeData("ridhuandf1@gmail.com");
-    }
-
-  }, [home, homeData]); // Empty dependency array - only run once on mount
 
   useEffect(() => {
     // Update offers when home data changes
@@ -109,7 +100,11 @@ const DashboardPage = () => {
                   Hello Buds,
                 </h2>
                 <h4 className="text-2xl md:text-4xl font-medium mb-2 text-gray-300">
-                  I am <span className="text-green-400">{home?.name === "LolBngt!" ? "Ridhuan" :home.name }</span> !
+                  I am{" "}
+                  <span className="text-green-400">
+                    {home?.name === "LolBngt!" ? "Ridhuan" : home.name}
+                  </span>{" "}
+                  !
                 </h4>
                 <h5 className="text-base md:text-lg font-base mb-2 text-white/70">
                   {home?.hobbies?.join(", ") ||
