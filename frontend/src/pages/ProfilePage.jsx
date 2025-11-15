@@ -88,7 +88,8 @@ const ProfilePage = () => {
       aboutData(user.email);
       projectsData(user.email);
     }
-  }, [user, homeData, aboutData, projectsData]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]); // Removed function dependencies to prevent infinite loop
 
   useEffect(() => {
     if (home) {

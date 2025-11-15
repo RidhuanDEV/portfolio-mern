@@ -8,12 +8,13 @@ export const csrfMiddleware = (req, res, next) => {
     return next();
   }
 
-  // Skip CSRF for authenticated API routes (home, about, projects) as they use JWT auth
+  // Skip CSRF for all auth routes as they handle authentication
   const skipCsrfPaths = [
+    "/api/auth",
     "/api/home",
     "/api/about",
     "/api/projects",
-    "/api/upload"
+    "/api/upload",
   ];
   if (skipCsrfPaths.some((p) => req.path.startsWith(p))) {
     return next();
@@ -22,19 +23,6 @@ export const csrfMiddleware = (req, res, next) => {
   // Read cookie token and header token
   const cookieToken = req.cookies?.["XSRF-TOKEN"];
   const headerToken = req.get("x-xsrf-token") || req.get("x-csrf-token");
-
-  // Allow unauthenticated public auth endpoints (signup/login/verify/forgot/reset)
-  // because the client won't have XSRF cookie yet when creating account or logging in.
-  const publicPaths = [
-    "/api/auth/signup",
-    "/api/auth/login",
-    "/api/auth/verify-email",
-    "/api/auth/forgot-password",
-    "/api/auth/reset-password",
-  ];
-  if (!cookieToken && publicPaths.some((p) => req.path.startsWith(p))) {
-    return next();
-  }
 
   if (!cookieToken || !headerToken) {
     return res
