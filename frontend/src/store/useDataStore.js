@@ -167,6 +167,7 @@ export const useDataStore = create((set) => ({
         headers: {
           "Content-Type": "multipart/form-data",
         },
+        timeout: 30000, // 30 seconds timeout
       });
       if (res.data.success) {
         set({ home: res.data.data });
@@ -175,9 +176,10 @@ export const useDataStore = create((set) => ({
         set({ error: true, message: res.data.message || "Failed to update" });
       }
     } catch (err) {
+      console.error("Update home error:", err);
       set({
         error: true,
-        message: err.response?.data?.message || "Failed to update home",
+        message: err.response?.data?.message || err.message || "Failed to update home",
       });
     } finally {
       set({ isLoading: false });

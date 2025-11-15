@@ -67,7 +67,7 @@ export const updateHome = async (req, res) => {
     let updateData = {};
 
     console.log("Received request body:", req.body);
-    console.log("Received files:", req.files);
+    console.log("Received files:", req.files ? req.files.length : 0);
 
     // Handle multipart form data
     if (req.body && typeof req.body === "object") {
@@ -89,20 +89,27 @@ export const updateHome = async (req, res) => {
     }
 
     // Handle file uploads
-    if (req.files && Array.isArray(req.files)) {
+    if (req.files && Array.isArray(req.files) && req.files.length > 0) {
+      console.log("Processing file uploads...");
+      
       // Upload profile picture
       const profilePicture = req.files.find(
         (file) => file.fieldname === "profile_picture"
       );
       if (profilePicture) {
-        const profileFolder = req.body.profile_picture_folder || "profile";
-        console.log("Uploading profile picture to folder:", profileFolder);
-        const profileResult = await uploadToCloudinary(
-          profilePicture.path,
-          profileFolder
-        );
-        updateData.profile_picture_url = profileResult.url;
-        console.log("Profile picture uploaded:", profileResult.url);
+        try {
+          const profileFolder = req.body.profile_picture_folder || "profile";
+          console.log("Uploading profile picture to folder:", profileFolder);
+          const profileResult = await uploadToCloudinary(
+            profilePicture.path,
+            profileFolder
+          );
+          updateData.profile_picture_url = profileResult.url;
+          console.log("Profile picture uploaded:", profileResult.url);
+        } catch (uploadError) {
+          console.error("Profile picture upload failed:", uploadError);
+          // Don't fail the whole request, just log the error
+        }
       }
 
       // Upload CV
@@ -110,12 +117,19 @@ export const updateHome = async (req, res) => {
         (file) => file.fieldname === "download_cv"
       );
       if (downloadCv) {
-        const cvFolder = req.body.download_cv_folder || "cv";
-        console.log("Uploading CV to folder:", cvFolder);
-        const cvResult = await uploadToCloudinary(downloadCv.path, cvFolder);
-        updateData.download_cv = cvResult.url;
-        console.log("CV uploaded:", cvResult.url);
+        try {
+          const cvFolder = req.body.download_cv_folder || "cv";
+          console.log("Uploading CV to folder:", cvFolder);
+          const cvResult = await uploadToCloudinary(downloadCv.path, cvFolder);
+          updateData.download_cv = cvResult.url;
+          console.log("CV uploaded:", cvResult.url);
+        } catch (uploadError) {
+          console.error("CV upload failed:", uploadError);
+          // Don't fail the whole request, just log the error
+        }
       }
+    } else {
+      console.log("No files to upload");
     }
 
     // Validate offers array if provided
@@ -138,12 +152,16 @@ export const updateHome = async (req, res) => {
       }
     }
 
+    console.log("Update data:", updateData);
+
     // Update home untuk user ini
     const home = await Home.findOneAndUpdate(
       { user: userId },
       updateData,
       { new: true, upsert: true } // upsert jika belum ada
     );
+
+    console.log("Updated home:", home);
 
     res.status(200).json({
       success: true,
@@ -154,7 +172,7 @@ export const updateHome = async (req, res) => {
     console.error("Error updating home:", error);
     res.status(500).json({
       success: false,
-      message: "Server error",
+      message: "Server error: " + error.message,
     });
   }
 };
