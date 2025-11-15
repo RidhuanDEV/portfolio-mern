@@ -96,6 +96,19 @@ Sebelum menjalankan aplikasi ini, pastikan Anda memiliki:
 
 2. **Frontend**: Jika diperlukan, setup environment variables di `frontend/` (saat ini tidak ada .env di frontend).
 
+## Seeding Database
+
+Untuk mengisi database dengan data awal (user, home, about, projects), jalankan:
+
+```bash
+cd backend
+npm run seed
+```
+
+Ini akan membuat:
+- User dengan email `ridhuandf1@gmail.com` dan password `password123`
+- Data home, about, dan 6 sample projects
+
 ## Running Locally
 
 ### Development Mode
@@ -239,6 +252,7 @@ Aplikasi ini sudah dikonfigurasi untuk deploy ke Vercel.
 - `npm run dev` - Jalankan development server dengan nodemon
 - `npm start` - Jalankan production server
 - `npm run build` - Install dependencies dan build frontend
+- `npm run seed` - Seed database dengan data awal
 
 ### Frontend Scripts
 
