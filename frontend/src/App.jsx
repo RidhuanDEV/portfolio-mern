@@ -8,7 +8,7 @@ import AboutPage from "./pages/AboutPage";
 import ProfilePage from "./pages/ProfilePage";
 import { useAuthStore } from "./store/authStore";
 import { useDataStore } from "./store/useDataStore";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -35,6 +35,7 @@ const ProtectedRoute = ({ children }) => {
 function App() {
   const { checkAuth, isCheckingAuth } = useAuthStore();
   const { homeData, aboutData, projectsData } = useDataStore();
+  const [dataRefreshTrigger, setDataRefreshTrigger] = useState(0);
 
   // Check authentication on app load
   useEffect(() => {
@@ -48,7 +49,12 @@ function App() {
     homeData(defaultEmail);
     aboutData(defaultEmail);
     projectsData(defaultEmail);
-  }, [homeData, aboutData, projectsData]);
+  }, [homeData, aboutData, projectsData, dataRefreshTrigger]);
+
+  // Function to trigger data refresh
+  const refreshData = () => {
+    setDataRefreshTrigger((prev) => prev + 1);
+  };
 
   // Show loading while checking authentication
   if (isCheckingAuth) {
@@ -117,7 +123,7 @@ function App() {
             path="/profile"
             element={
               <ProtectedRoute>
-                <ProfilePage />
+                <ProfilePage onDataUpdate={refreshData} />
               </ProtectedRoute>
             }
           />

@@ -8,7 +8,7 @@ import { useAuthStore } from "../store/authStore";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 
-const ProfilePage = () => {
+const ProfilePage = ({ onDataUpdate }) => {
   const { logout } = useAuthStore();
   const navigate = useNavigate();
   const {
@@ -153,6 +153,9 @@ const ProfilePage = () => {
       await updateHome(formData);
       toast.success("Home data saved successfully!");
 
+      // Trigger data refresh in App.jsx
+      if (onDataUpdate) onDataUpdate();
+
       // Reset file states after successful save
       setHomeFiles({
         profile_picture: null,
@@ -223,6 +226,9 @@ const ProfilePage = () => {
       await updateAbout(formData);
       toast.success("About data saved successfully!");
 
+      // Trigger data refresh in App.jsx
+      if (onDataUpdate) onDataUpdate();
+
       // Reset file states after successful save
       setAboutFiles({
         people_images: [],
@@ -256,6 +262,9 @@ const ProfilePage = () => {
 
       await createProject(formData);
       toast.success("Project created successfully!");
+
+      // Trigger data refresh in App.jsx
+      if (onDataUpdate) onDataUpdate();
 
       // Reset form after successful submission
       setProjectForm({

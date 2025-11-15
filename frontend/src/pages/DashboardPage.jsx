@@ -46,14 +46,49 @@ const DashboardPage = () => {
     }
   }, [home]); // Only depend on home, not homeData
 
-  const downloadResume = () => {
+  const downloadResume = async () => {
     const resumeUrl = home?.download_cv || "./resume.pdf";
-    const link = document.createElement("a");
-    link.href = resumeUrl;
-    link.download = "resume.pdf";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+
+    try {
+      // If it's a Cloudinary URL, fetch it first to handle authentication
+      if (resumeUrl.includes("cloudinary.com")) {
+        const response = await fetch(resumeUrl, {
+          method: "GET",
+          headers: {
+            Accept: "application/pdf,*/*",
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = "resume.pdf";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        // Clean up the object URL
+        window.URL.revokeObjectURL(url);
+      } else {
+        // For local files, use direct download
+        const link = document.createElement("a");
+        link.href = resumeUrl;
+        link.download = "resume.pdf";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+    } catch (error) {
+      console.error("Error downloading resume:", error);
+      // Fallback: try opening in new tab
+      window.open(resumeUrl, "_blank");
+    }
   };
 
   const contactMe = () => {
@@ -100,11 +135,7 @@ const DashboardPage = () => {
                   Hello Buds,
                 </h2>
                 <h4 className="text-2xl md:text-4xl font-medium mb-2 text-gray-300">
-                  I am{" "}
-                  <span className="text-green-400">
-                    Ridhuan
-                  </span>{" "}
-                  !
+                  I am <span className="text-green-400">Ridhuan</span> !
                 </h4>
                 <h5 className="text-base md:text-lg font-base mb-2 text-white/70">
                   {home?.hobbies?.join(", ") ||
