@@ -50,13 +50,44 @@ const DashboardPage = () => {
     const resumeUrl = home?.download_cv || "./resume.pdf";
 
     try {
-      // Direct download for local files
-      const link = document.createElement("a");
-      link.href = resumeUrl;
-      link.download = "resume.pdf";
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      // Check if it's a Vercel Blob URL or local path
+      if (
+        resumeUrl.startsWith("http") ||
+        resumeUrl.includes("vercel-storage.com")
+      ) {
+        // For Vercel Blob URLs, fetch and download
+        const response = await fetch(resumeUrl, {
+          method: "GET",
+          headers: {
+            Accept: "application/pdf,*/*",
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = "resume.pdf";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        // Clean up the object URL
+        window.URL.revokeObjectURL(url);
+      } else {
+        // For local files, use direct download
+        const link = document.createElement("a");
+        link.href = resumeUrl;
+        link.download = "resume.pdf";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
     } catch (error) {
       console.error("Error downloading resume:", error);
       // Fallback: try opening in new tab

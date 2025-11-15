@@ -1,10 +1,16 @@
 import { Home } from "../models/home.model.js";
 import { User } from "../models/user.model.js";
+import { uploadToCloudinary } from "../utils/cloudinary.utils.js";
+import { uploadToVercelBlob } from "../utils/vercel-blob.utils.js";
 import path from "path";
 import fs from "fs";
 import { fileURLToPath } from "url";
 
-// Helper function to save CV locally
+// Check if running in production (Vercel)
+const isProduction =
+  process.env.NODE_ENV === "production" || process.env.VERCEL === "1";
+
+// Helper function to save CV locally (for development)
 const saveCvLocally = (file, userId) => {
   const __filename = fileURLToPath(import.meta.url);
   const __dirname = path.dirname(__filename);
@@ -25,6 +31,17 @@ const saveCvLocally = (file, userId) => {
 
   // Return relative path for serving
   return `/uploads/cv/${filename}`;
+};
+
+// Helper function to save CV to Vercel Blob (for production)
+const saveCvToBlob = async (file, userId) => {
+  try {
+    const result = await uploadToVercelBlob(file.path, "cv");
+    return result.url;
+  } catch (error) {
+    console.error("Failed to upload CV to Vercel Blob:", error);
+    throw error;
+  }
 };
 
 //gethome untuk fungsi all user (view) - tanpa autentikasi, berdasarkan email
@@ -65,7 +82,7 @@ export const getHome = async (req, res) => {
         hobbies: home.hobbies,
         intro: home.intro,
         profile_picture_url: home.profile_picture_url,
-        download_cv: home.download_cv, // No need to fix URL since it's local
+        download_cv: home.download_cv, // Local path for dev, Vercel Blob URL for production
         facebook_url: home.facebook_url,
         instagram_url: home.instagram_url,
         linkedin_url: home.linkedin_url,
@@ -137,18 +154,25 @@ export const updateHome = async (req, res) => {
         }
       }
 
-      // Upload CV - Save locally instead of Cloudinary
+      // Upload CV - Hybrid approach: Local for dev, Vercel Blob for production
       const downloadCv = req.files.find(
         (file) => file.fieldname === "download_cv"
       );
       if (downloadCv) {
         try {
-          console.log("Saving CV locally...");
-          const cvPath = saveCvLocally(downloadCv, userId);
-          updateData.download_cv = cvPath;
-          console.log("CV saved locally:", cvPath);
+          if (isProduction) {
+            console.log("Uploading CV to Vercel Blob (production)...");
+            const cvUrl = await saveCvToBlob(downloadCv, userId);
+            updateData.download_cv = cvUrl;
+            console.log("CV uploaded to Vercel Blob:", cvUrl);
+          } else {
+            console.log("Saving CV locally (development)...");
+            const cvPath = saveCvLocally(downloadCv, userId);
+            updateData.download_cv = cvPath;
+            console.log("CV saved locally:", cvPath);
+          }
         } catch (uploadError) {
-          console.error("CV save failed:", uploadError);
+          console.error("CV upload failed:", uploadError);
           // Don't fail the whole request, just log the error
         }
       }
