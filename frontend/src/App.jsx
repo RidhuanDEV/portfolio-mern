@@ -33,7 +33,7 @@ const ProtectedRoute = ({ children }) => {
 };
 
 function App() {
-  const { checkAuth, isCheckingAuth, user } = useAuthStore();
+  const { checkAuth, isCheckingAuth } = useAuthStore();
   const { homeData, aboutData, projectsData } = useDataStore();
 
   // Check authentication on app load
@@ -41,15 +41,14 @@ function App() {
     checkAuth();
   }, [checkAuth]);
 
-  // Fetch all portfolio data after authentication
+  // Fetch all portfolio data for public access (always fetch, regardless of auth status)
   useEffect(() => {
-    if (!isCheckingAuth && user?.email) {
-      // Fetch all data for public pages
-      homeData(user.email);
-      aboutData(user.email);
-      projectsData(user.email);
-    }
-  }, [isCheckingAuth, user, homeData, aboutData, projectsData]);
+    // Use default email for public portfolio data
+    const defaultEmail = "ridhuandf1@gmail.com";
+    homeData(defaultEmail);
+    aboutData(defaultEmail);
+    projectsData(defaultEmail);
+  }, [homeData, aboutData, projectsData]);
 
   // Show loading while checking authentication
   if (isCheckingAuth) {

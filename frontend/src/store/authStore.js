@@ -91,7 +91,10 @@ export const useAuthStore = create((set) => ({
         isAuthenticated: false,
         isCheckingAuth: false,
       });
-      console.error("Auth check failed:", error.message);
+      // Don't log 401 errors as they are expected when token is invalid
+      if (error.response?.status !== 401) {
+        console.error("Auth check failed:", error.message);
+      }
     }
   },
 }));
