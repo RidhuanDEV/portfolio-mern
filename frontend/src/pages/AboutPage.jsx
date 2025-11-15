@@ -9,8 +9,10 @@ const AboutPage = () => {
   const { about, isLoading, error, message, aboutData } = useDataStore();
 
   useEffect(() => {
-    aboutData("ridhuandf1@gmail.com");
-  }, [aboutData]);
+    if (!about) {
+      aboutData("ridhuandf1@gmail.com");
+    }
+  }, [aboutData, about]);
 
   // Default data jika belum ada data dari database
   const defaultTestimonials = [

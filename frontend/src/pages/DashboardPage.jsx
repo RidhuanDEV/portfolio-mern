@@ -37,8 +37,8 @@ const DashboardPage = () => {
     if (!home) {
       homeData("ridhuandf1@gmail.com");
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Empty dependency array - only run once on mount
+
+  }, [home, homeData]); // Empty dependency array - only run once on mount
 
   useEffect(() => {
     // Update offers when home data changes
@@ -271,7 +271,8 @@ const DashboardPage = () => {
               What I <span className="text-yellow-400">Offer</span>
             </h2>
             <p className="text-blue-100 text-lg md:text-xl max-w-2xl mx-auto">
-              Professional services tailored to bring your vision to life
+              {home?.offer_title ||
+                "Professional services tailored to bring your vision to life"}
             </p>
             <div className="w-24 h-1 bg-yellow-400 mx-auto mt-4 rounded-full"></div>
           </Motion.div>

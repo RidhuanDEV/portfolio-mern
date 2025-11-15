@@ -8,8 +8,10 @@ const ProjectPage = () => {
   const { projects, isLoading, error, message, projectsData } = useDataStore();
 
   useEffect(() => {
-    projectsData("ridhuandf1@gmail.com"); // fetch projects berdasarkan email
-  }, [projectsData]);
+    if (!projects) {
+      projectsData("ridhuandf1@gmail.com"); // fetch projects berdasarkan email
+    }
+  }, [projects, projectsData]);
 
   if (isLoading) {
     return (
