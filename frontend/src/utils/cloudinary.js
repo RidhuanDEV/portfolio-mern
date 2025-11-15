@@ -35,6 +35,16 @@ export const uploadFileToCloudinary = async (file, folder = "other") => {
   }
 };
 
+// Fix Cloudinary URL for PDFs (raw resources)
+export const fixCloudinaryPdfUrl = (url) => {
+  if (!url || !url.includes("cloudinary.com")) {
+    return url;
+  }
+
+  // Replace /image/upload/ with /raw/upload/ for PDF files
+  return url.replace("/image/upload/", "/raw/upload/");
+};
+
 // Preview image before upload
 export const getImagePreview = (file) => {
   return new Promise((resolve, reject) => {
