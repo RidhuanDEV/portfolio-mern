@@ -51,7 +51,6 @@ coverage/
 # Misc
 .eslintcache
 .turbo/
-*.md
 *.txt
 
 test_sanitization*.sh
