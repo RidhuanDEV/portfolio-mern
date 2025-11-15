@@ -1,21 +1,8 @@
 import { Home } from "../models/home.model.js";
 import { User } from "../models/user.model.js";
-import { uploadToCloudinary } from "../utils/cloudinary.utils.js";
 import path from "path";
 import fs from "fs";
 import { fileURLToPath } from "url";
-
-// Helper function to fix Cloudinary PDF URLs
-const fixCloudinaryPdfUrl = (url) => {
-  if (!url || !url.includes("cloudinary.com")) {
-    return url;
-  }
-  // For PDFs, ensure they use /raw/upload/ for raw resources
-  if (url.includes(".pdf")) {
-    return url.replace("/image/upload/", "/raw/upload/");
-  }
-  return url;
-};
 
 // Helper function to save CV locally
 const saveCvLocally = (file, userId) => {

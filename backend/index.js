@@ -40,7 +40,7 @@ app.set("trust proxy", 1);
 app.use(generalLimiter);
 
 // ===== Body & Cookie parsers with size limits =====
-app.use(express.json({ limit: "50mb" })); // Allow Cloudinary upload URLs
+app.use(express.json({ limit: "50mb" })); // Allow large file uploads
 app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 app.use(cookieParser());
 

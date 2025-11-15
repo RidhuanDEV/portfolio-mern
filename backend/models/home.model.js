@@ -67,8 +67,8 @@ const homeSchema = new mongoose.Schema(
 
 export const Home = mongoose.model("home", homeSchema);
 
-// Note: For Cloudinary integration:
+// Note: For file storage:
 // - profile_picture_url: stores Cloudinary image URL
-// - download_cv: stores Cloudinary PDF/file URL
+// - download_cv: stores local file path (e.g., /uploads/cv/cv_userId_timestamp.pdf)
 // - offers[].image_url: stores Cloudinary image URL for each offer
 // - All URLs (facebook_url, instagram_url, github_url, linkedin_url) remain as social media links
