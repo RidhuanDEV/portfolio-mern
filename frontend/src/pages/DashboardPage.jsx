@@ -33,19 +33,25 @@ const DashboardPage = () => {
   const homeData = useDataStore((store) => store.homeData);
 
   useEffect(() => {
-    homeData("ridhuandf1@gmail.com"); // <-- dengan argumen
-    if (home?.offer_url && home?.description && home?.offer_title) {
-      setOffer([
-        {
-          imageSrc: home.offer_url,
-          description: home.description,
-          title: home.offer_title,
-        },
-      ]);
+    // Only fetch data once on mount, not on every home change
+    if (!home) {
+      homeData("ridhuandf1@gmail.com");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Empty dependency array - only run once on mount
+
+  useEffect(() => {
+    // Update offers when home data changes
+    if (home?.offers && home.offers.length > 0) {
+      setOffer(home.offers.map(offer => ({
+        imageSrc: offer.image_url,
+        description: offer.description,
+        title: home.offer_title || "Service"
+      })));
     } else {
       setOffer(offers); // fallback ke default
     }
-  }, [home, homeData]);
+  }, [home]); // Only depend on home, not homeData
 
   const downloadResume = () => {
     const resumeUrl = home?.download_cv || "./resume.pdf";
