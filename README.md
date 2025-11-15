@@ -1,6 +1,6 @@
 # Portfolio MERN Stack
 
-Sebuah aplikasi portfolio lengkap dengan sistem autentikasi, menggunakan MERN stack (MongoDB, Express.js, React, Node.js). Aplikasi ini memungkinkan pengguna untuk membuat akun, login, mengelola profil, dan menampilkan proyek portfolio dengan fitur upload gambar melalui Cloudinary.
+Sebuah aplikasi portfolio lengkap dengan sistem autentikasi, menggunakan MERN stack (MongoDB, Express.js, React, Node.js). Aplikasi ini memungkinkan pengguna untuk membuat akun, login, mengelola profil, dan menampilkan proyek portfolio dengan fitur upload gambar melalui Cloudinary dan file storage hybrid (local untuk development, Vercel Blob untuk production).
 
 ## Fitur Utama
 
@@ -8,7 +8,8 @@ Sebuah aplikasi portfolio lengkap dengan sistem autentikasi, menggunakan MERN st
 - **Manajemen Profil**: Update informasi pengguna
 - **Dashboard**: Halaman utama dengan informasi pengguna
 - **Manajemen Proyek**: Tambah, edit, hapus proyek portfolio
-- **Upload Gambar**: Integrasi dengan Cloudinary untuk upload gambar
+- **Upload Gambar**: Integrasi dengan Cloudinary untuk upload gambar profil dan proyek
+- **Upload CV**: Hybrid storage - local storage untuk development, Vercel Blob untuk production
 - **Email Notification**: Menggunakan Mailtrap untuk email
 - **Responsive Design**: Menggunakan Tailwind CSS dan Framer Motion
 - **Security**: Helmet, CORS, rate limiting, CSRF protection
@@ -24,6 +25,7 @@ Sebuah aplikasi portfolio lengkap dengan sistem autentikasi, menggunakan MERN st
 - **JWT** - Autentikasi
 - **Bcryptjs** - Hashing password
 - **Cloudinary** - Upload dan manajemen gambar
+- **Vercel Blob** - File storage untuk production (CV uploads)
 - **Mailtrap** - Email service
 - **Multer** - File upload middleware
 - **Helmet, CORS, Rate Limiting** - Security middleware
@@ -47,6 +49,7 @@ Sebelum menjalankan aplikasi ini, pastikan Anda memiliki:
 - **Node.js** (versi 20 atau lebih baru)
 - **MongoDB** (lokal atau cloud seperti MongoDB Atlas)
 - **Akun Cloudinary** (untuk upload gambar)
+- **Akun Vercel** (untuk file storage production - Vercel Blob)
 - **Akun Mailtrap** (untuk email testing)
 
 ## Installation
@@ -92,9 +95,41 @@ Sebelum menjalankan aplikasi ini, pastikan Anda memiliki:
    CLOUDINARY_CLOUD_NAME=your_cloudinary_cloud_name
    CLOUDINARY_API_KEY=your_cloudinary_api_key
    CLOUDINARY_API_SECRET=your_cloudinary_api_secret
+   BLOB_READ_WRITE_TOKEN=vercel_blob_token_here
    ```
 
+   **Catatan untuk BLOB_READ_WRITE_TOKEN:**
+
+   - Diperlukan untuk upload CV ke Vercel Blob di production
+   - Dapatkan token dari Vercel Dashboard → Storage → Blob → Create Token
+   - Untuk development lokal, token ini tidak wajib (akan menggunakan local storage)
+
 2. **Frontend**: Jika diperlukan, setup environment variables di `frontend/` (saat ini tidak ada .env di frontend).
+
+## Setup Vercel Blob (untuk Production)
+
+Aplikasi ini menggunakan **hybrid storage** untuk upload CV:
+
+- **Development**: File disimpan di local storage (`backend/uploads/cv/`)
+- **Production**: File diupload ke Vercel Blob (1GB free tier)
+
+### Setup Vercel Blob:
+
+1. **Login ke Vercel Dashboard**
+2. **Pergi ke Storage → Blob**
+3. **Create Store** (jika belum ada)
+4. **Generate Token**:
+   - Klik store yang sudah dibuat
+   - Pergi ke tab "Tokens"
+   - Create new token dengan permission "Read/Write"
+   - Copy token dan paste ke `BLOB_READ_WRITE_TOKEN` di environment variables
+
+### Cara Kerja Hybrid Storage:
+
+- Aplikasi secara otomatis mendeteksi environment (`NODE_ENV` atau `VERCEL`)
+- Development: CV disimpan di folder `backend/uploads/cv/`
+- Production: CV diupload ke Vercel Blob dan URL disimpan di database
+- Frontend dapat mendownload dari kedua sumber (local path atau Vercel Blob URL)
 
 ## Seeding Database
 
@@ -183,7 +218,7 @@ Aplikasi ini sudah dikonfigurasi dengan Docker untuk development dan production.
 
 ### Deploy ke Vercel
 
-Aplikasi ini sudah dikonfigurasi untuk deploy ke Vercel.
+Aplikasi ini sudah dikonfigurasi untuk deploy ke Vercel dengan hybrid storage support.
 
 1. **Setup akun Vercel** dan install Vercel CLI:
 
@@ -206,8 +241,16 @@ Aplikasi ini sudah dikonfigurasi untuk deploy ke Vercel.
    ```
 
 4. **Environment Variables di Vercel:**
+
    - Untuk backend, set environment variables di dashboard Vercel sesuai dengan `.env`
+   - **PENTING**: Pastikan `BLOB_READ_WRITE_TOKEN` sudah diset untuk upload CV di production
    - Untuk frontend, set `VITE_API_URL` ke URL backend yang sudah di-deploy
+
+5. **Setup Vercel Blob di Production:**
+   - Setelah deploy backend, pastikan `BLOB_READ_WRITE_TOKEN` sudah dikonfigurasi
+   - Jika belum ada store Vercel Blob, buat store baru di Vercel Dashboard
+   - Generate token dengan permission Read/Write
+   - Update environment variable di Vercel project settings
 
 ### Deploy ke Platform Lain
 
@@ -238,11 +281,12 @@ Aplikasi ini sudah dikonfigurasi untuk deploy ke Vercel.
 ### Upload Routes
 
 - `POST /api/upload` - Upload file ke Cloudinary
+- `PUT /api/home` - Update home data (termasuk upload CV dengan hybrid storage)
 
 ### Home/About Routes
 
 - `GET /api/home` - Get home data
-- `PUT /api/home` - Update home data
+- `PUT /api/home` - Update home data (support upload CV dengan hybrid storage)
 - `GET /api/about` - Get about data
 - `PUT /api/about` - Update about data
 
@@ -262,6 +306,34 @@ Aplikasi ini sudah dikonfigurasi untuk deploy ke Vercel.
 - `npm run lint` - Jalankan ESLint
 - `npm run preview` - Preview production build
 
+## Troubleshooting
+
+### Upload CV tidak berfungsi di Production
+
+**Masalah**: CV tidak bisa didownload setelah deploy ke Vercel
+
+**Solusi**:
+
+1. Pastikan `BLOB_READ_WRITE_TOKEN` sudah diset di Vercel environment variables
+2. Periksa apakah Vercel Blob store sudah dibuat dan token memiliki permission Read/Write
+3. Upload ulang CV setelah setup token - file lama mungkin corrupt
+
+### File Storage
+
+**Development**: CV disimpan di `backend/uploads/cv/` (local storage)
+**Production**: CV diupload ke Vercel Blob dengan URL public
+
+Frontend secara otomatis mendeteksi dan menangani kedua jenis storage.
+
+### Environment Detection
+
+Aplikasi menggunakan logika berikut untuk menentukan storage:
+
+```javascript
+const isProduction =
+  process.env.NODE_ENV === "production" || process.env.VERCEL === "1";
+```
+
 ## Contributing
 
 1. Fork repository ini
@@ -270,6 +342,16 @@ Aplikasi ini sudah dikonfigurasi untuk deploy ke Vercel.
 4. Push ke branch (`git push origin feature/AmazingFeature`)
 5. Buat Pull Request
 
+## Changelog
+
+### v2.0.0 - Hybrid Storage Update
+
+- ✅ Migrasi upload CV dari Cloudinary ke hybrid storage
+- ✅ Local storage untuk development
+- ✅ Vercel Blob untuk production
+- ✅ Auto-detection environment
+- ✅ Improved error handling untuk file uploads
+
 ## License
 
 Distributed under the ISC License. See `LICENSE` for more information.
@@ -277,3 +359,7 @@ Distributed under the ISC License. See `LICENSE` for more information.
 ## Contact
 
 Jika ada pertanyaan, silakan buat issue di repository ini.
+
+**Author**: Ridhuan Rangga Kusuma
+**Email**: ridhuandf1@gmail.com
+**GitHub**: [@RidhuanDEV](https://github.com/RidhuanDEV)
