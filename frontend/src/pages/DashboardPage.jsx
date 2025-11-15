@@ -102,7 +102,7 @@ const DashboardPage = () => {
                 <h4 className="text-2xl md:text-4xl font-medium mb-2 text-gray-300">
                   I am{" "}
                   <span className="text-green-400">
-                    {home?.name === "LolBngt!" ? "Ridhuan" : home.name}
+                    Ridhuan
                   </span>{" "}
                   !
                 </h4>
@@ -120,7 +120,7 @@ const DashboardPage = () => {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.2 }}
                   >
-                    <p className="text-base md:text-lg font-light text-white mb-3 px-2 md:px-4 leading-relaxed">
+                    <p className="text-sm md:text-base font-light text-white mb-3 px-2 md:px-4 leading-relaxed">
                       {home?.intro ||
                         "I am a passionate UI/UX designer and frontend developer with a knack for creating visually stunning and user-friendly digital experiences. With a strong foundation in design principles and a keen eye for detail, I specialize in crafting intuitive interfaces that captivate users and drive engagement."}
                     </p>
