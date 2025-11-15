@@ -91,7 +91,7 @@ export const updateHome = async (req, res) => {
     // Handle file uploads
     if (req.files && Array.isArray(req.files) && req.files.length > 0) {
       console.log("Processing file uploads...");
-      
+
       // Upload profile picture
       const profilePicture = req.files.find(
         (file) => file.fieldname === "profile_picture"

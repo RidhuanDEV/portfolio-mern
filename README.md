@@ -106,6 +106,7 @@ npm run seed
 ```
 
 Ini akan membuat:
+
 - User dengan email `ridhuandf1@gmail.com` dan password `password123`
 - Data home, about, dan 6 sample projects
 

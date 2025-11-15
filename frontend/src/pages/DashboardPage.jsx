@@ -43,11 +43,13 @@ const DashboardPage = () => {
   useEffect(() => {
     // Update offers when home data changes
     if (home?.offers && home.offers.length > 0) {
-      setOffer(home.offers.map(offer => ({
-        imageSrc: offer.image_url,
-        description: offer.description,
-        title: home.offer_title || "Service"
-      })));
+      setOffer(
+        home.offers.map((offer) => ({
+          imageSrc: offer.image_url,
+          description: offer.description,
+          title: home.offer_title || "Service",
+        }))
+      );
     } else {
       setOffer(offers); // fallback ke default
     }
@@ -107,7 +109,7 @@ const DashboardPage = () => {
                   Hello Buds,
                 </h2>
                 <h4 className="text-2xl md:text-4xl font-medium mb-2 text-gray-300">
-                  I am <span className="text-green-400">Roger</span> !
+                  I am <span className="text-green-400">{home?.name === "LolBngt!" ? "Ridhuan" :home.name }</span> !
                 </h4>
                 <h5 className="text-base md:text-lg font-base mb-2 text-white/70">
                   {home?.hobbies?.join(", ") ||
